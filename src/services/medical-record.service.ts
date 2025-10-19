@@ -107,7 +107,7 @@ export class MedicalRecordService {
   async createRecord(
     recordData: Omit<MedicalRecord, 'id' | 'createdAt' | 'updatedAt'>
   ): Promise<MedicalRecord> {
-    //console.log('📝 Données reçues pour création:', recordData);
+    console.log('📝 Données reçues pour création:', recordData);
     // Validation
     if (!recordData.patientId) {
       throw new Error('L\'ID du patient est obligatoire');
@@ -123,14 +123,14 @@ export class MedicalRecordService {
 
     // Vérifier que le patient existe
     const patientExists = await this.patientRepository.findById(recordData.patientId);
-    //console.log('👥 Patient existe:', patientExists);
+    console.log('👥 Patient existe:', patientExists);
     if (!patientExists) {
       throw new Error(`Patient avec l'ID ${recordData.patientId} non trouvé`);
     }
 
     // Créer le dossier
     const result = await this.repository.create(recordData);
-  //console.log('✅ Enregistrement créé:', result);
+  console.log('✅ Enregistrement créé:', result);
 
     //return this.repository.create(recordData);
     return result;
@@ -182,3 +182,4 @@ export class MedicalRecordService {
   }
 
 }
+
