@@ -27,6 +27,7 @@ app.use(cors({
   origin: env.CORS_ORIGIN,
   //credentials: true,
 }));
+console.log('🟢 CORS_ORIGIN:', env.CORS_ORIGIN);
 
 // ============================================
 // MIDDLEWARE DE PARSING
@@ -153,3 +154,4 @@ const startServer = async (): Promise<void> => {
 // Démarrer l'application
 
 startServer();
+
