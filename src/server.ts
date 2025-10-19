@@ -25,7 +25,7 @@ app.use(helmet());
 // CORS - Autorise les requêtes cross-origin
 app.use(cors({
   origin: env.CORS_ORIGIN,
-  credentials: true,
+  //credentials: true,
 }));
 
 // ============================================
@@ -151,4 +151,5 @@ const startServer = async (): Promise<void> => {
 };
 
 // Démarrer l'application
+
 startServer();
