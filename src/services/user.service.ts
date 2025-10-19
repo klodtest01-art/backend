@@ -51,7 +51,7 @@ export class UserService {
     role: UserRole;
     assignedPatients?: ID[];
   }): Promise<Omit<User, 'password'>> {
-    console.log('🎯 USER SERVICE - createUser appelé avec:', userData);
+    //console.log('🎯 USER SERVICE - createUser appelé avec:', userData);
     if (!userData.username || userData.username.trim().length < VALIDATION_CONSTANTS.MIN_USERNAME_LENGTH) {
       throw new Error(`Le nom d'utilisateur doit contenir au moins ${VALIDATION_CONSTANTS.MIN_USERNAME_LENGTH} caractères`);
     }
@@ -63,12 +63,12 @@ export class UserService {
     if (!userData.password || userData.password.length < VALIDATION_CONSTANTS.MIN_PASSWORD_LENGTH) {
       throw new Error(`Le mot de passe doit contenir au moins ${VALIDATION_CONSTANTS.MIN_PASSWORD_LENGTH} caractères`);
     }
-console.log('🔍 USER SERVICE - Vérification si username existe...');
+//console.log('🔍 USER SERVICE - Vérification si username existe...');
     const usernameExists = await this.repository.existsByUsername(userData.username);
     if (usernameExists) {
       throw new Error(`Le nom d'utilisateur ${userData.username} existe déjà`);
     }
-console.log('🔍 USER SERVICE - Création de l\'utilisateur...');
+//console.log('🔍 USER SERVICE - Création de l\'utilisateur...');
     // ✅ Pas de hashage, mot de passe en clair
     const newUser = await this.repository.create({
       username: userData.username,
@@ -76,7 +76,7 @@ console.log('🔍 USER SERVICE - Création de l\'utilisateur...');
       role: userData.role,
       assignedPatients: userData.assignedPatients || [],
     });
-console.log('✅ USER SERVICE - Utilisateur créé en DB:', newUser);
+//console.log('✅ USER SERVICE - Utilisateur créé en DB:', newUser);
 
     const { password: _, ...userWithoutPassword } = newUser;
     return userWithoutPassword;
@@ -143,4 +143,5 @@ console.log('✅ USER SERVICE - Utilisateur créé en DB:', newUser);
     const { password: _, ...userWithoutPassword } = user;
     return userWithoutPassword;
   }
+
 }
