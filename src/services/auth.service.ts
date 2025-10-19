@@ -96,7 +96,7 @@ export class AuthService {
     try {
       return jwt.verify(token, env.JWT_SECRET) as AuthPayload;
     } catch (error) {
-      //console.error('❌ JWT Verification failed:', error);
+      console.error('❌ JWT Verification failed:', error);
       throw new Error('Token invalide ou expiré');
     }
   }
@@ -110,3 +110,4 @@ export class AuthService {
   }
 
 }
+
