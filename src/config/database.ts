@@ -9,8 +9,12 @@ import { env } from './env';
 /**
  * Configuration du pool de connexions PostgreSQL
  */
+
 const poolConfig: PoolConfig = {
   connectionString: env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false // ← IMPORTANT pour Neon
+  },
   max: 20, // Maximum 20 connexions simultanées
   idleTimeoutMillis: 30000, // Fermer les connexions inactives après 30s
   connectionTimeoutMillis: 2000, // Timeout de connexion de 2s
@@ -74,4 +78,5 @@ export const getClient = () => pool.connect();
 export const closePool = async (): Promise<void> => {
   await pool.end();
   console.log('🔌 Pool PostgreSQL fermé');
+
 };
