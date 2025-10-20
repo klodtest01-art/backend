@@ -14,18 +14,19 @@ export class UserService {
     this.repository = new UserRepository();
   }
 
-  async getAllUsers(): Promise<Omit<User, 'password'>[]> {
+  // ✅ MODIFIÉ - Renvoie les users AVEC mot de passe
+  async getAllUsers(): Promise<User[]> { // Retirer Omit<User, 'password'>
     const users = await this.repository.findAll();
-    return users.map(({ password: _, ...user }) => user);
+    return users; // Retirer le map qui supprime le password
   }
 
-  async getUserById(id: ID): Promise<Omit<User, 'password'>> {
+  // ✅ MODIFIÉ - Renvoie l'user AVEC mot de passe
+  async getUserById(id: ID): Promise<User> { // Retirer Omit<User, 'password'>
     const user = await this.repository.findById(id);
     if (!user) {
       throw new Error(`Utilisateur avec l'ID ${id} non trouvé`);
     }
-    const { password: _, ...userWithoutPassword } = user;
-    return userWithoutPassword;
+    return user; // Retirer la suppression du password
   }
 
   async getUserByUsername(username: string): Promise<Omit<User, 'password'>> {
@@ -37,21 +38,23 @@ export class UserService {
     return userWithoutPassword;
   }
 
-  async getUsersByRole(role: UserRole): Promise<Omit<User, 'password'>[]> {
+  async getUsersByRole(role: UserRole): Promise<User[]> { // Retirer Omit<User, 'password'>
     const users = await this.repository.findByRole(role);
-    return users.map(({ password: _, ...user }) => user);
+    return users; // Retirer le map qui supprime le password
   }
 
   /**
    * Crée un utilisateur (mot de passe en clair)
    */
+  // ✅ MODIFIÉ - Renvoie l'user AVEC mot de passe
   async createUser(userData: {
     username: string;
     password: string;
     role: UserRole;
     assignedPatients?: ID[];
-  }): Promise<Omit<User, 'password'>> {
+  }): Promise<User> { // Retirer Omit<User, 'password'>
     console.log('🎯 USER SERVICE - createUser appelé avec:', userData);
+
     if (!userData.username || userData.username.trim().length < VALIDATION_CONSTANTS.MIN_USERNAME_LENGTH) {
       throw new Error(`Le nom d'utilisateur doit contenir au moins ${VALIDATION_CONSTANTS.MIN_USERNAME_LENGTH} caractères`);
     }
@@ -69,6 +72,7 @@ console.log('🔍 USER SERVICE - Vérification si username existe...');
       throw new Error(`Le nom d'utilisateur ${userData.username} existe déjà`);
     }
 console.log('🔍 USER SERVICE - Création de l\'utilisateur...');
+
     // ✅ Pas de hashage, mot de passe en clair
     const newUser = await this.repository.create({
       username: userData.username,
@@ -78,14 +82,13 @@ console.log('🔍 USER SERVICE - Création de l\'utilisateur...');
     });
 console.log('✅ USER SERVICE - Utilisateur créé en DB:', newUser);
 
-    const { password: _, ...userWithoutPassword } = newUser;
-    return userWithoutPassword;
+    return newUser;
   }
 
   async updateUser(
     id: ID,
-    userData: Partial<Omit<User, 'password'>>
-  ): Promise<Omit<User, 'password'>> {
+    userData: Partial<User> // Changer pour User au lieu de Omit<User, 'password'>
+  ): Promise<User> { // Retirer Omit<User, 'password'>
     const existingUser = await this.repository.findById(id);
     if (!existingUser) {
       throw new Error(`Utilisateur avec l'ID ${id} non trouvé`);
@@ -103,8 +106,7 @@ console.log('✅ USER SERVICE - Utilisateur créé en DB:', newUser);
       throw new Error(`Échec de la mise à jour de l'utilisateur ${id}`);
     }
 
-    const { password: _, ...userWithoutPassword } = updatedUser;
-    return userWithoutPassword;
+    return updatedUser;
   }
 
   async deleteUser(id: ID): Promise<void> {
@@ -114,33 +116,33 @@ console.log('✅ USER SERVICE - Utilisateur créé en DB:', newUser);
     }
   }
 
-  async assignPatients(userId: ID, patientIds: ID[]): Promise<Omit<User, 'password'>> {
+  // ✅ MODIFIÉ - Renvoie l'user AVEC mot de passe
+  async assignPatients(userId: ID, patientIds: ID[]): Promise<User> { // Retirer Omit<User, 'password'>
     const user = await this.repository.updateAssignedPatients(userId, patientIds);
     if (!user) {
       throw new Error(`Utilisateur avec l'ID ${userId} non trouvé`);
     }
 
-    const { password: _, ...userWithoutPassword } = user;
-    return userWithoutPassword;
+    return user; // Retirer la suppression du password
   }
 
-  async addAssignedPatient(userId: ID, patientId: ID): Promise<Omit<User, 'password'>> {
+  // ✅ MODIFIÉ - Renvoie l'user AVEC mot de passe
+  async addAssignedPatient(userId: ID, patientId: ID): Promise<User> { // Retirer Omit<User, 'password'>
     const user = await this.repository.addAssignedPatient(userId, patientId);
     if (!user) {
       throw new Error(`Utilisateur avec l'ID ${userId} non trouvé`);
     }
 
-    const { password: _, ...userWithoutPassword } = user;
-    return userWithoutPassword;
+    return user; // Retirer la suppression du password
   }
 
-  async removeAssignedPatient(userId: ID, patientId: ID): Promise<Omit<User, 'password'>> {
+  // ✅ MODIFIÉ - Renvoie l'user AVEC mot de passe
+  async removeAssignedPatient(userId: ID, patientId: ID): Promise<User> { // Retirer Omit<User, 'password'>
     const user = await this.repository.removeAssignedPatient(userId, patientId);
     if (!user) {
       throw new Error(`Utilisateur avec l'ID ${userId} non trouvé`);
     }
 
-    const { password: _, ...userWithoutPassword } = user;
-    return userWithoutPassword;
+    return user; // Retirer la suppression du password
   }
 }
