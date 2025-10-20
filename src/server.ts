@@ -25,14 +25,10 @@ app.use(helmet());
 // CORS - Autorise les requêtes cross-origin
 app.use(cors({
   origin: env.CORS_ORIGIN,
-  credentials: true,
-}));
-
-// Gérer toutes les requêtes OPTIONS pour le préflight CORS
-app.options('*', cors({
-  origin: env.CORS_ORIGIN,
-  credentials: true,
-}));
+  credentials: true, // ✅ DÉCOMMENTER cette ligne
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}))
 
 // ============================================
 // MIDDLEWARE DE PARSING
@@ -139,3 +135,4 @@ const startServer = async (): Promise<void> => {
 };
 
 startServer();
+
