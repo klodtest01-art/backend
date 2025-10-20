@@ -11,7 +11,7 @@ import medicalRecordRoutes from './medical-record.routes';
 
 const router = Router();
 
-// ✅ AJOUTER une route racine pour /api
+// ✅ Route racine simple pour /api
 router.get('/', (req, res) => {
   res.json({
     success: true,
@@ -19,15 +19,16 @@ router.get('/', (req, res) => {
     version: '1.0.0',
     endpoints: {
       auth: '/api/auth',
-      patients: '/api/patients', 
+      patients: '/api/patients',
       users: '/api/users',
-      medicalRecords: '/api/medical-records'
+      medicalRecords: '/api/medical-records',
+      health: '/health'
     }
   });
 });
 
 // Monter les routes sur leurs chemins respectifs
-router.use('/auth', authRoutes);           // ✅ /api/auth/login
+router.use('/auth', authRoutes);
 router.use('/patients', patientRoutes);
 router.use('/users', userRoutes);
 router.use('/medical-records', medicalRecordRoutes);
