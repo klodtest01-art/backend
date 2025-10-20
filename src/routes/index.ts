@@ -11,7 +11,7 @@ import medicalRecordRoutes from './medical-record.routes';
 
 const router = Router();
 
-router.get('/test', (req, res) => {
+router.get('/test', (_req, res) => {
   res.json({ success: true, message: 'Test route works!' });
 });
 
@@ -39,4 +39,5 @@ router.use('/users', userRoutes);
 router.use('/medical-records', medicalRecordRoutes);
 
 export default router;
+
 
