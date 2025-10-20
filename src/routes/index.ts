@@ -11,6 +11,21 @@ import medicalRecordRoutes from './medical-record.routes';
 
 const router = Router();
 
+// ✅ AJOUTER une route racine pour /api
+router.get('/', (req, res) => {
+  res.json({
+    success: true,
+    message: 'API Gestion Patients - Dialyse',
+    version: '1.0.0',
+    endpoints: {
+      auth: '/api/auth',
+      patients: '/api/patients', 
+      users: '/api/users',
+      medicalRecords: '/api/medical-records'
+    }
+  });
+});
+
 // Monter les routes sur leurs chemins respectifs
 router.use('/auth', authRoutes);           // ✅ /api/auth/login
 router.use('/patients', patientRoutes);
