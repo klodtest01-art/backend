@@ -11,6 +11,10 @@ import medicalRecordRoutes from './medical-record.routes';
 
 const router = Router();
 
+router.get('/test', (req, res) => {
+  res.json({ success: true, message: 'Test route works!' });
+});
+
 // ✅ Route racine corrigée pour /api
 router.get('/', (_req, res) => {
   res.json({
@@ -22,7 +26,8 @@ router.get('/', (_req, res) => {
       patients: '/api/patients',
       users: '/api/users',
       medicalRecords: '/api/medical-records',
-      health: '/health'
+      health: '/health',
+      test: '/api/test' // ← Ajouter le test
     }
   });
 });
@@ -34,3 +39,4 @@ router.use('/users', userRoutes);
 router.use('/medical-records', medicalRecordRoutes);
 
 export default router;
+
