@@ -11,8 +11,8 @@ import medicalRecordRoutes from './medical-record.routes';
 
 const router = Router();
 
-// ✅ Route racine simple pour /api
-router.get('/', (req, res) => {
+// ✅ Route racine corrigée pour /api
+router.get('/', (_req, res) => {
   res.json({
     success: true,
     message: 'API Gestion Patients - Dialyse',
