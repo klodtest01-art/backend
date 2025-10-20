@@ -1,21 +1,12 @@
-/**
- * Point d'entrée de toutes les routes
- * Agrège toutes les routes de l'application
- */
-
 import { Router } from 'express';
-import authRoutes from './auth.routes';
+import authRoutes from './auth.routes'; // ✅ Doit pointer vers le bon fichier
 import patientRoutes from './patient.routes';
 import userRoutes from './user.routes';
 import medicalRecordRoutes from './medical-record.routes';
 
 const router = Router();
 
-router.get('/test', (_req, res) => {
-  res.json({ success: true, message: 'Test route works!' });
-});
-
-// ✅ Route racine corrigée pour /api
+// Route racine
 router.get('/', (_req, res) => {
   res.json({
     success: true,
@@ -27,17 +18,20 @@ router.get('/', (_req, res) => {
       users: '/api/users',
       medicalRecords: '/api/medical-records',
       health: '/health',
-      test: '/api/test' // ← Ajouter le test
+      test: '/api/test'
     }
   });
 });
 
-// Monter les routes sur leurs chemins respectifs
-router.use('/auth', authRoutes);
-router.use('/patients', patientRoutes);
-router.use('/users', userRoutes);
-router.use('/medical-records', medicalRecordRoutes);
+// Route test
+router.get('/test', (_req, res) => {
+  res.json({ success: true, message: 'Test route works!' });
+});
+
+// Monter les routes - VÉRIFIEZ CETTE PARTIE
+router.use('/auth', authRoutes);        // ✅ /api/auth/login
+router.use('/patients', patientRoutes); // /api/patients
+router.use('/users', userRoutes);       // /api/users  
+router.use('/medical-records', medicalRecordRoutes); // /api/medical-records
 
 export default router;
-
-
