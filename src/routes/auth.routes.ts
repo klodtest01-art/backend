@@ -9,15 +9,23 @@ router.post('/login', async (req, res) => {
 
   try {
     const result = await authService.login(username, password);
-    res.json(result); // { user, token }
+    res.json({
+      success: true, // ✅ AJOUTER
+      ...result
+    });
   } catch (err: unknown) {
     if (err instanceof Error) {
-      res.status(401).json({ message: err.message });
+      res.status(401).json({ 
+        success: false, // ✅ AJOUTER
+        message: err.message 
+      });
     } else {
-      res.status(500).json({ message: 'Erreur inconnue' });
+      res.status(500).json({ 
+        success: false, // ✅ AJOUTER
+        message: 'Erreur inconnue' 
+      });
     }
   }
 });
-
 
 export default router;
