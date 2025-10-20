@@ -1,72 +1,69 @@
-// TEST DE CONNEXION BD - À AJOUTER AVANT LES AUTRES ROUTES
-app.get('/debug-db', async (_req, res) => {
-  try {
-    console.log('🔍 Testing DB connection from Render...');
-    
-    // Test 1: Connexion basique
-    const timeResult = await pool.query('SELECT NOW() as current_time');
-    
-    // Test 2: Compter les utilisateurs
-    const usersResult = await pool.query('SELECT COUNT(*) as count FROM users');
-    
-    // Test 3: Voir les premiers utilisateurs
-    const users = await pool.query('SELECT id, username, role FROM users LIMIT 5');
-    
-    res.json({
-      success: true,
-      database: {
-        connected: true,
-        currentTime: timeResult.rows[0].current_time
-      },
-      counts: {
-        users: parseInt(usersResult.rows[0].count)
-      },
-      sampleUsers: users.rows
-    });
-    
-  } catch (error: any) {
-    console.error('❌ DB Debug Error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Database connection failed',
-      error: error.message
-    });
-  }
+// VOTRE CODE ORIGINAL qui fonctionnait
+import express, { Application } from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
+import morgan from 'morgan';
+import { env } from './config/env';
+import { pool } from './config/database';
+import routes from './routes';
+import { errorHandler, notFoundHandler } from './middleware/error.middleware';
+
+const app: Application = express();
+
+// Middlewares
+app.use(helmet());
+app.use(cors({
+  origin: env.CORS_ORIGIN,
+  credentials: true,
+}));
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+if (env.NODE_ENV === 'development') {
+  app.use(morgan('dev'));
+} else {
+  app.use(morgan('combined'));
+}
+
+// Health check
+app.get('/health', (_req, res) => {
+  res.json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    environment: env.NODE_ENV,
+  });
 });
 
+// API Routes
+app.use('/api', routes);
 
-// ============================================
-// TEST DE LA BASE DE DONNÉES
-// ============================================
+// Error handling
+app.use(notFoundHandler);
+app.use(errorHandler);
 
-app.get('/test-db', async (_req, res) => {
+// Database connection test
+const testDatabaseConnection = async (): Promise<void> => {
   try {
-    // Test 1: Vérifier la connexion basique
-    const result = await pool.query('SELECT NOW() as current_time');
+    await pool.query('SELECT NOW()');
+    console.log('✅ Base de données PostgreSQL connectée');
+  } catch (error) {
+    console.error('❌ Échec de connexion à PostgreSQL:', error);
+    process.exit(1);
+  }
+};
+
+// Start server
+const startServer = async (): Promise<void> => {
+  try {
+    await testDatabaseConnection();
     
-    // Test 2: Vérifier si la table users existe et a des données
-    const users = await pool.query('SELECT COUNT(*) as user_count FROM users');
-    
-    // Test 3: Vérifier si la table patients existe
-    const patients = await pool.query('SELECT COUNT(*) as patient_count FROM patients');
-    
-    res.json({
-      success: true,
-      database: {
-        connected: true,
-        currentTime: result.rows[0].current_time
-      },
-      tables: {
-        users: users.rows[0].user_count,
-        patients: patients.rows[0].patient_count
-      }
+    app.listen(env.PORT, () => {
+      console.log(`🏥 API démarrée sur le port ${env.PORT}`);
     });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Erreur base de données',
-      error: error instanceof Error ? error.message : 'Unknown error'
-    });
+    console.error('❌ Échec du démarrage:', error);
+    process.exit(1);
   }
-});
+};
 
+startServer();
