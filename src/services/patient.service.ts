@@ -131,12 +131,21 @@ export class PatientService {
    * @param id - ID du patient
    * @throws Error si le patient n'existe pas
    */
-  async deletePatient(id: ID): Promise<void> {
+async deletePatient(id: ID): Promise<void> {
+  console.log(`🗑️ PATIENT SERVICE - Suppression du patient ${id}`);
+  
+  try {
     const deleted = await this.repository.delete(id);
     if (!deleted) {
       throw new Error(`Patient avec l'ID ${id} non trouvé`);
     }
+    console.log(`✅ PATIENT SERVICE - Patient ${id} supprimé avec succès`);
+  } catch (error) {
+    console.error(`❌ PATIENT SERVICE - Erreur suppression patient ${id}:`, error);
+    throw error;
   }
+}
+
 
   /**
    * Récupère les statistiques des patients
@@ -157,4 +166,5 @@ export class PatientService {
       finTraitement: allPatients.filter(p => p.type_patient === 'Fin Traitement').length,
     };
   }
+
 }
