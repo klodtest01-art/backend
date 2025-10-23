@@ -26,7 +26,7 @@ export class UserRepository extends BaseRepository<User, UserRow> {
       username: user.username,
       password: user.password,
       role: user.role,
-      assigned_patients: user.assignedPatients,
+      assigned_patients: user.assignedPatients || [],
     });
 console.log('📝 USER REPOSITORY - Requête SQL:', text);
   console.log('🔢 USER REPOSITORY - Paramètres:', values);
@@ -147,4 +147,5 @@ console.log('📝 USER REPOSITORY - Requête SQL:', text);
     );
     return rows.length > 0 ? this.rowMapper(rows[0]) : null;
   }
+
 }
