@@ -132,9 +132,29 @@ router.delete(
   authorize('admin'),
   asyncHandler(async (req: AuthRequest, res: Response) => {
     const id = parseInt(req.params.id, 10);
+    
+    // ✅ CORRECTION: Nettoyer les assignations avant suppression
+    // 1. D'abord, trouver tous les utilisateurs qui ont ce patient assigné
+    const allUsers = await userService.getAllUsers();
+    const usersWithPatient = allUsers.filter((user: any) => 
+      user.assignedPatients.includes(id)
+    );
+    
+    // 2. Retirer le patient de chaque utilisateur
+    for (const user of usersWithPatient) {
+      await userService.updateUser(user.id!, {
+        ...user,
+        assignedPatients: user.assignedPatients.filter((patientId: number) => patientId !== id)
+      });
+    }
+    
+    // 3. Maintenant supprimer le patient
     await patientService.deletePatient(id);
+    
+    console.log(`✅ Patient ${id} supprimé et retiré de ${usersWithPatient.length} utilisateur(s)`);
     sendNoContent(res);
   })
 );
+
 
 export default router;
