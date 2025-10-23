@@ -5,13 +5,18 @@
 
 import { Router, Response } from 'express';
 import { PatientService } from '../services/patient.service';
+import { UserService } from '../services/user.service'; // ← AJOUTER CET IMPORT
 import { authenticate, authorize, AuthRequest } from '../middleware/auth.middleware';
 import { asyncHandler } from '../middleware/error.middleware';
 import { sendSuccess, sendCreated, sendNoContent } from '../utils/response';
 import type { Patient } from '../shared/types/patient';
+import type { User } from '../shared/types/user'; // ← AJOUTER
+import type { ID } from '../shared/types/common'; // ← AJOUTER
+
 
 const router = Router();
 const patientService = new PatientService();
+const userService = new UserService(); // ← AJOUTER CETTE INSTANCE
 
 /**
  * GET /patients
@@ -136,7 +141,7 @@ router.delete(
     // ✅ CORRECTION: Nettoyer les assignations avant suppression
     // 1. D'abord, trouver tous les utilisateurs qui ont ce patient assigné
     const allUsers = await userService.getAllUsers();
-    const usersWithPatient = allUsers.filter((user: any) => 
+    const usersWithPatient = allUsers.filter((user: User) => 
       user.assignedPatients.includes(id)
     );
     
@@ -144,7 +149,7 @@ router.delete(
     for (const user of usersWithPatient) {
       await userService.updateUser(user.id!, {
         ...user,
-        assignedPatients: user.assignedPatients.filter((patientId: number) => patientId !== id)
+        assignedPatients: user.assignedPatients.filter((patientId: ID) => patientId !== id)
       });
     }
     
