@@ -110,17 +110,21 @@ protected buildInsertQuery(
 ): { text: string; values: unknown[] } {
   const entries = Object.entries(fields).filter(([_, value]) => value !== undefined);
   
+  // 🚨 VÉRIFIER SI assigned_patients EST BIEN TRAITÉ
+  console.log('🔍 BUILD INSERT - Fields:', fields);
+  console.log('🔍 BUILD INSERT - Entries:', entries);
+  
   const columns = entries.map(([key]) => key);
-  const placeholders = entries.map((_, index) => '$' + (index + 1)); // ✅ Concaténation
+  const placeholders = entries.map((_, index) => '$' + (index + 1));
   const values = entries.map(([_, value]) => value);
 
-  //const text = 'INSERT INTO ' + this.tableName + ' (' + columns.join(', ') + ') VALUES (' + placeholders.join(', ') + ') RETURNING *';
   const text = `INSERT INTO ${this.tableName} (${columns.join(', ')}) VALUES (${placeholders.join(', ')}) RETURNING *`;
-
-  return {
-    text,
-    values,
-  };
+  
+  console.log('🔍 BUILD INSERT - SQL:', text);
+  console.log('🔍 BUILD INSERT - Values:', values);
+  
+  return { text, values };
 }
+
 
 }
