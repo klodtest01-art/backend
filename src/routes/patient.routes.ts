@@ -5,18 +5,17 @@
 
 import { Router, Response } from 'express';
 import { PatientService } from '../services/patient.service';
-import { UserService } from '../services/user.service'; // ← AJOUTER CET IMPORT
+import { UserService } from '../services/user.service';
 import { authenticate, authorize, AuthRequest } from '../middleware/auth.middleware';
 import { asyncHandler } from '../middleware/error.middleware';
 import { sendSuccess, sendCreated, sendNoContent } from '../utils/response';
 import type { Patient } from '../shared/types/patient';
-import type { User } from '../shared/types/user'; // ← AJOUTER
-import type { ID } from '../shared/types/common'; // ← AJOUTER
-
+import type { User } from '../shared/types/user';
+import type { ID } from '../shared/types/common';
 
 const router = Router();
 const patientService = new PatientService();
-const userService = new UserService(); // ← AJOUTER CETTE INSTANCE
+const userService = new UserService();
 
 /**
  * GET /patients
@@ -92,7 +91,7 @@ router.post(
   authenticate,
   authorize('admin'),
   asyncHandler(async (req: AuthRequest, res: Response) => {
-    const patientData = req.body; // Directement req.body
+    const patientData = req.body;
     const patient = await patientService.createPatient(patientData);
     sendCreated(res, patient, 'Patient créé avec succès');
   })
@@ -109,18 +108,7 @@ router.put(
   authorize('admin'),
   asyncHandler(async (req: AuthRequest, res: Response) => {
     const id = parseInt(req.params.id, 10);
-    
-    // ❌ SUPPRIMEZ ces conversions !
-    // const patientData = {
-    //   ...req.body,
-    //   ...(req.body.date_naissance && { date_naissance: new Date(req.body.date_naissance) }),
-    //   ...(req.body.date_debut && { date_debut: new Date(req.body.date_debut) }),
-    //   ...(req.body.date_fin && { date_fin: new Date(req.body.date_fin) }),
-    // };
-    
-    // ✅ UTILISEZ directement req.body
     const patientData = req.body;
-
     const patient = await patientService.updatePatient(id, patientData);
     sendSuccess(res, patient, 'Patient modifié avec succès');
   })
@@ -138,28 +126,37 @@ router.delete(
   asyncHandler(async (req: AuthRequest, res: Response) => {
     const id = parseInt(req.params.id, 10);
     
-    // ✅ CORRECTION: Nettoyer les assignations avant suppression
+    console.log(`🗑️ Suppression du patient ${id} - Nettoyage des assignations...`);
+    
     // 1. D'abord, trouver tous les utilisateurs qui ont ce patient assigné
-    const allUsers = await userService.getAllUsers();
+    const allUsers: User[] = await userService.getAllUsers();
     const usersWithPatient = allUsers.filter((user: User) => 
       user.assignedPatients.includes(id)
     );
     
+    console.log(`📋 ${usersWithPatient.length} utilisateur(s) avec ce patient assigné`);
+    
     // 2. Retirer le patient de chaque utilisateur
     for (const user of usersWithPatient) {
+      console.log(`🔄 Retrait du patient ${id} de l'utilisateur ${user.username}`);
+      
+      const updatedAssignedPatients = user.assignedPatients.filter((patientId: ID) => patientId !== id);
+      
       await userService.updateUser(user.id!, {
         ...user,
-        assignedPatients: user.assignedPatients.filter((patientId: ID) => patientId !== id)
+        assignedPatients: updatedAssignedPatients
       });
+      
+      console.log(`✅ Patient ${id} retiré de ${user.username}`);
     }
     
     // 3. Maintenant supprimer le patient
+    console.log(`🗑️ Suppression définitive du patient ${id}`);
     await patientService.deletePatient(id);
     
     console.log(`✅ Patient ${id} supprimé et retiré de ${usersWithPatient.length} utilisateur(s)`);
     sendNoContent(res);
   })
 );
-
 
 export default router;
