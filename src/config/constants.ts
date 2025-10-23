@@ -36,8 +36,9 @@ export const API_CONSTANTS = {
  * Constantes de validation pour l'authentification
  */
 export const VALIDATION_CONSTANTS = {
-  MIN_PASSWORD_LENGTH: 6,
+  MIN_PASSWORD_LENGTH: 3,
   MIN_USERNAME_LENGTH: 3,
   MAX_USERNAME_LENGTH: 50,
   BCRYPT_ROUNDS: 10, // Rounds de hashing bcrypt
+
 } as const;
